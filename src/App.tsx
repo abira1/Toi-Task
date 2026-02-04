@@ -221,7 +221,7 @@ export function App() {
         );
 
       case 'overview':
-        return <OverviewPage />;
+        return <OverviewPage tasks={tasks} teamMembers={teamMembers} />;
       case 'profile':
         return (
           <ProfilePage
