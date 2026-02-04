@@ -148,6 +148,63 @@ export function App() {
     return <LoginPage onLogin={async () => {}} />;
   }
 
+  // Check if user is authenticated but NOT authorized (not in teamMembers)
+  if (isAuthenticated && !isAuthorized && authError === 'UNAUTHORIZED') {
+    return (
+      <div className="min-h-screen bg-[var(--cream)] flex items-center justify-center p-4 relative overflow-hidden">
+        {/* Fun background decoration */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-10 left-10 w-32 h-32 bg-[var(--coral)] rounded-full blur-3xl"></div>
+          <div className="absolute bottom-10 right-10 w-40 h-40 bg-[var(--teal)] rounded-full blur-3xl"></div>
+        </div>
+
+        <div className="relative bg-white border-4 border-[var(--black)] rounded-3xl p-8 max-w-lg w-full shadow-[12px_12px_0px_0px_var(--coral)] animate-in fade-in zoom-in-95 duration-500">
+          {/* Emoji Icon */}
+          <div className="flex items-center justify-center mb-6">
+            <div className="w-24 h-24 bg-[var(--mustard)] border-4 border-[var(--black)] rounded-full flex items-center justify-center text-6xl shadow-[6px_6px_0px_0px_var(--black)]">
+              🔒
+            </div>
+          </div>
+
+          {/* Error Message */}
+          <h2 className="text-3xl font-black text-center text-[var(--black)] mb-4">
+            Access Denied!
+          </h2>
+          
+          <div className="bg-[var(--cream)] border-3 border-[var(--black)] rounded-xl p-6 mb-6">
+            <p className="text-xl font-bold text-center text-[var(--black)] leading-relaxed">
+              Sorry, you cannot login!! 😢
+            </p>
+            <p className="text-xl font-bold text-center text-[var(--black)] leading-relaxed mt-2">
+              This is a very secure site!!
+            </p>
+            <p className="text-2xl font-black text-center text-[var(--teal)] mt-4">
+              Go and cook the meal! 🍳👨‍🍳
+            </p>
+          </div>
+
+          {/* Info Box */}
+          <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 mb-6">
+            <p className="text-sm text-blue-800 text-center font-medium">
+              💡 <strong>Need access?</strong> Contact your administrator to add your email to the team members list.
+            </p>
+          </div>
+
+          {/* Logout Button */}
+          <button
+            onClick={() => {
+              logout();
+              window.location.href = '/';
+            }}
+            className="w-full bg-[var(--coral)] text-white py-4 px-6 rounded-xl font-black text-lg border-3 border-[var(--black)] shadow-[4px_4px_0px_0px_var(--black)] hover:shadow-[6px_6px_0px_0px_var(--black)] hover:-translate-y-0.5 active:translate-y-0 active:shadow-[2px_2px_0px_0px_var(--black)] transition-all flex items-center justify-center gap-2">
+            <LogOut className="w-5 h-5" />
+            Sign Out
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const renderPage = () => {
     switch (currentPage) {
       case 'home':
