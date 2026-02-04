@@ -215,6 +215,7 @@ export function useFirebaseAuth() {
       setUser(null);
       setIsAuthenticated(false);
       setIsAdmin(false);
+      setIsAuthorized(false);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to logout';
       setError(errorMessage);
@@ -229,6 +230,7 @@ export function useFirebaseAuth() {
     user,
     firebaseUser,
     isAuthenticated,
+    isAuthorized,
     isAdmin,
     isLoading,
     error,
