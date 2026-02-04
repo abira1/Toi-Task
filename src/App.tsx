@@ -31,7 +31,7 @@ const emptyUser: User = {
 };
 
 export function App() {
-  const { user, isAuthenticated, isLoading, isAdmin, logout } = useFirebaseAuth();
+  const { user, isAuthenticated, isAuthorized, isLoading, isAdmin, error: authError, logout } = useFirebaseAuth();
   const { tasks, addTask, toggleTaskCompletion, addComment, likeTask, error: tasksError } = useFirebaseTasks(user?.id);
   const { teamMembers, addTeamMember, isAdmin: isAdminUser } = useFirebaseTeamMembers(isAdmin);
   
