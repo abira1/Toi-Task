@@ -5,7 +5,8 @@ import {
   onAuthStateChanged,
   User as FirebaseUser
 } from 'firebase/auth';
-import { auth, googleProvider, isUserAdmin, ALLOWED_ADMIN_EMAILS } from '../firebase';
+import { ref, get } from 'firebase/database';
+import { auth, googleProvider, isUserAdmin, ALLOWED_ADMIN_EMAILS, database } from '../firebase';
 import { User } from '../types';
 
 export function useFirebaseAuth() {
@@ -15,6 +16,7 @@ export function useFirebaseAuth() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
   // Listen to auth state changes
   useEffect(() => {
