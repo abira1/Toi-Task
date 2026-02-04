@@ -138,15 +138,16 @@ export function useFirebaseAuth() {
         setFirebaseUser(result.user);
         setIsAdmin(true);
         setIsAuthenticated(true);
+        setIsAuthorized(true);
 
         const userData: User = {
           id: result.user.uid,
-          name: result.user.displayName || 'User',
+          name: result.user.displayName || 'Admin',
           email: userEmail || '',
           role: 'admin',
-          bio: '',
-          avatar: result.user.photoURL || `https://ui-avatars.com/api/?name=${result.user.displayName || 'User'}&background=00BFA5&color=fff`,
-          expertise: [],
+          bio: 'Administrator',
+          avatar: result.user.photoURL || `https://ui-avatars.com/api/?name=${result.user.displayName || 'Admin'}&background=00BFA5&color=fff`,
+          expertise: ['Administration'],
           stats: {
             tasksCompleted: 0,
             streak: 0,
@@ -156,27 +157,43 @@ export function useFirebaseAuth() {
         setUser(userData);
         return result.user;
       } else {
-        // Non-admin user login - allow but set role as 'user'
-        setFirebaseUser(result.user);
-        setIsAdmin(false);
-        setIsAuthenticated(true);
+        // Non-admin: Check if email exists in teamMembers
+        const memberData = await checkTeamMemberAccess(userEmail || '');
+        
+        if (memberData) {
+          // User is authorized
+          setFirebaseUser(result.user);
+          setIsAdmin(false);
+          setIsAuthenticated(true);
+          setIsAuthorized(true);
 
-        const userData: User = {
-          id: result.user.uid,
-          name: result.user.displayName || 'User',
-          email: userEmail || '',
-          role: 'user',
-          bio: '',
-          avatar: result.user.photoURL || `https://ui-avatars.com/api/?name=${result.user.displayName || 'User'}&background=00BFA5&color=fff`,
-          expertise: [],
-          stats: {
-            tasksCompleted: 0,
-            streak: 0,
-            points: 0
-          }
-        };
-        setUser(userData);
-        return result.user;
+          const userData: User = {
+            id: result.user.uid,
+            name: memberData.name || result.user.displayName || 'User',
+            email: userEmail || '',
+            role: memberData.role || 'Team Member',
+            bio: memberData.bio || '',
+            avatar: memberData.avatar || result.user.photoURL || `https://ui-avatars.com/api/?name=${result.user.displayName || 'User'}&background=00BFA5&color=fff`,
+            coverImage: memberData.coverImage,
+            expertise: memberData.expertise || [],
+            stats: memberData.stats || {
+              tasksCompleted: 0,
+              streak: 0,
+              points: 0
+            }
+          };
+          setUser(userData);
+          return result.user;
+        } else {
+          // User NOT in teamMembers
+          setFirebaseUser(result.user);
+          setIsAdmin(false);
+          setIsAuthenticated(true);
+          setIsAuthorized(false);
+          setUser(null);
+          setError('UNAUTHORIZED');
+          return result.user;
+        }
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to login with Google';
