@@ -18,6 +18,32 @@ export function useFirebaseAuth() {
   const [error, setError] = useState<string | null>(null);
   const [isAuthorized, setIsAuthorized] = useState(false);
 
+  // Check if user email exists in teamMembers
+  const checkTeamMemberAccess = async (email: string): Promise<User | null> => {
+    try {
+      const membersRef = ref(database, 'teamMembers');
+      const snapshot = await get(membersRef);
+      
+      if (snapshot.exists()) {
+        const members = snapshot.val();
+        // Find member by email
+        const memberEntry = Object.entries(members).find(
+          ([_, memberData]: [string, any]) => 
+            memberData.email?.toLowerCase() === email.toLowerCase()
+        );
+        
+        if (memberEntry) {
+          const [_, memberData] = memberEntry as [string, any];
+          return memberData as User;
+        }
+      }
+      return null;
+    } catch (err) {
+      console.error('Error checking team member access:', err);
+      return null;
+    }
+  };
+
   // Listen to auth state changes
   useEffect(() => {
     setIsLoading(true);
@@ -29,28 +55,63 @@ export function useFirebaseAuth() {
           const adminStatus = isUserAdmin(firebaseUser.email);
           setIsAdmin(adminStatus);
 
-          // Create user object from Firebase user
-          const userData: User = {
-            id: firebaseUser.uid,
-            name: firebaseUser.displayName || 'User',
-            email: firebaseUser.email || '',
-            role: adminStatus ? 'admin' : 'user',
-            bio: '',
-            avatar: firebaseUser.photoURL || `https://ui-avatars.com/api/?name=${firebaseUser.displayName || 'User'}&background=00BFA5&color=fff`,
-            expertise: [],
-            stats: {
-              tasksCompleted: 0,
-              streak: 0,
-              points: 0
+          // Check if user is admin or exists in teamMembers
+          if (adminStatus) {
+            // Admin can access without being in teamMembers
+            const userData: User = {
+              id: firebaseUser.uid,
+              name: firebaseUser.displayName || 'Admin',
+              email: firebaseUser.email || '',
+              role: 'admin',
+              bio: 'Administrator',
+              avatar: firebaseUser.photoURL || `https://ui-avatars.com/api/?name=${firebaseUser.displayName || 'Admin'}&background=00BFA5&color=fff`,
+              expertise: ['Administration'],
+              stats: {
+                tasksCompleted: 0,
+                streak: 0,
+                points: 0
+              }
+            };
+            setUser(userData);
+            setIsAuthorized(true);
+            setError(null);
+          } else {
+            // Non-admin: Check if email exists in teamMembers
+            const memberData = await checkTeamMemberAccess(firebaseUser.email || '');
+            
+            if (memberData) {
+              // User is authorized - sync with teamMember data
+              const userData: User = {
+                id: firebaseUser.uid,
+                name: memberData.name || firebaseUser.displayName || 'User',
+                email: firebaseUser.email || '',
+                role: memberData.role || 'Team Member',
+                bio: memberData.bio || '',
+                avatar: memberData.avatar || firebaseUser.photoURL || `https://ui-avatars.com/api/?name=${firebaseUser.displayName || 'User'}&background=00BFA5&color=fff`,
+                coverImage: memberData.coverImage,
+                expertise: memberData.expertise || [],
+                stats: memberData.stats || {
+                  tasksCompleted: 0,
+                  streak: 0,
+                  points: 0
+                }
+              };
+              setUser(userData);
+              setIsAuthorized(true);
+              setError(null);
+            } else {
+              // User NOT in teamMembers - unauthorized
+              setUser(null);
+              setIsAuthorized(false);
+              setError('UNAUTHORIZED');
             }
-          };
-          setUser(userData);
-          setError(null);
+          }
         } else {
           setFirebaseUser(null);
           setUser(null);
           setIsAuthenticated(false);
           setIsAdmin(false);
+          setIsAuthorized(false);
         }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Authentication error';
