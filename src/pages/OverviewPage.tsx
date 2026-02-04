@@ -188,7 +188,7 @@ export function OverviewPage({ tasks, teamMembers }: OverviewPageProps) {
             className="bg-[var(--cream-light)] border-b-2 border-[var(--black)] text-sm sm:text-base" />
 
           <CardContent className="p-3 sm:p-6">
-            <WeeklyBarChart data={mockWeeklyData} />
+            <WeeklyBarChart data={weeklyData} />
           </CardContent>
         </Card>
 
@@ -198,7 +198,7 @@ export function OverviewPage({ tasks, teamMembers }: OverviewPageProps) {
             className="bg-[var(--cream-light)] border-b-2 border-[var(--black)] text-sm sm:text-base" />
 
           <CardContent className="p-3 sm:p-6">
-            <CompletionDonut data={mockCompletionData} />
+            <CompletionDonut data={completionData} />
           </CardContent>
         </Card>
 
@@ -208,7 +208,7 @@ export function OverviewPage({ tasks, teamMembers }: OverviewPageProps) {
             className="bg-[var(--cream-light)] border-b-2 border-[var(--black)] text-sm sm:text-base" />
 
           <CardContent className="p-3 sm:p-6">
-            <TrendsLineChart data={mockTrendData} />
+            <TrendsLineChart data={trendData} />
           </CardContent>
         </Card>
       </div>
