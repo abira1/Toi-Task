@@ -1,4 +1,5 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useMemo } from 'react';
+import { Task, User } from '../types';
 import {
   CompletionDonut,
   WeeklyBarChart,
@@ -7,88 +8,121 @@ import {
 import { Card, CardHeader, CardContent } from '../components/ui/Card';
 import { Star } from '../components/IllustrationElements';
 import { CheckSquare, TrendingUp, Users } from 'lucide-react';
-const mockWeeklyData = [
-{
-  name: 'Mon',
-  tasks: 12
-},
-{
-  name: 'Tue',
-  tasks: 19
-},
-{
-  name: 'Wed',
-  tasks: 15
-},
-{
-  name: 'Thu',
-  tasks: 22
-},
-{
-  name: 'Fri',
-  tasks: 18
-},
-{
-  name: 'Sat',
-  tasks: 8
-},
-{
-  name: 'Sun',
-  tasks: 5
-}];
 
-const mockCompletionData = [
-{
-  name: 'Completed',
-  value: 65
-},
-{
-  name: 'Remaining',
-  value: 35
-}];
+interface OverviewPageProps {
+  tasks: Task[];
+  teamMembers: User[];
+}
 
-const mockTrendData = [
-{
-  name: 'W1',
-  productivity: 75
-},
-{
-  name: 'W2',
-  productivity: 82
-},
-{
-  name: 'W3',
-  productivity: 78
-},
-{
-  name: 'W4',
-  productivity: 90
-}];
+export function OverviewPage({ tasks, teamMembers }: OverviewPageProps) {
+  // Calculate real statistics from tasks
+  const stats = useMemo(() => {
+    const totalTasks = tasks.length;
+    const completedTasks = tasks.filter(t => t.completed).length;
+    const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+    const activeMembers = new Set(tasks.map(t => t.userId)).size;
 
-const stats = [
-{
-  label: 'Total Tasks',
-  value: '142',
-  shortLabel: '142 tasks',
-  color: 'bg-[var(--teal)]',
-  icon: CheckSquare
-},
-{
-  label: 'Completion',
-  value: '87%',
-  shortLabel: '87%',
-  color: 'bg-[var(--mustard)]',
-  icon: TrendingUp
-},
-{
-  label: 'Active',
-  value: '8',
-  shortLabel: '8 active',
-  color: 'bg-[var(--coral)]',
-  icon: Users
-}];
+    return [
+      {
+        label: 'Total Tasks',
+        value: totalTasks.toString(),
+        shortLabel: `${totalTasks} tasks`,
+        color: 'bg-[var(--teal)]',
+        icon: CheckSquare
+      },
+      {
+        label: 'Completion',
+        value: `${completionRate}%`,
+        shortLabel: `${completionRate}%`,
+        color: 'bg-[var(--mustard)]',
+        icon: TrendingUp
+      },
+      {
+        label: 'Active',
+        value: activeMembers.toString(),
+        shortLabel: `${activeMembers} active`,
+        color: 'bg-[var(--coral)]',
+        icon: Users
+      }
+    ];
+  }, [tasks]);
 
-export function OverviewPage() {
+  // Generate weekly data from tasks
+  const weeklyData = useMemo(() => {
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const today = new Date();
+    const weekData = days.map((name, index) => {
+      const dayDate = new Date(today);
+      dayDate.setDate(today.getDate() - (today.getDay() - index));
+      dayDate.setHours(0, 0, 0, 0);
+      
+      const nextDay = new Date(dayDate);
+      nextDay.setDate(dayDate.getDate() + 1);
+      
+      const tasksCount = tasks.filter(task => {
+        const taskDate = new Date(task.createdAt);
+        return taskDate >= dayDate && taskDate < nextDay;
+      }).length;
+      
+      return {
+        name,
+        tasks: tasksCount
+      };
+    });
+    
+    return weekData;
+  }, [tasks]);
+
+  // Generate completion data
+  const completionData = useMemo(() => {
+    const completed = tasks.filter(t => t.completed).length;
+    const pending = tasks.length - completed;
+    
+    return [
+      {
+        name: 'Completed',
+        value: completed
+      },
+      {
+        name: 'Remaining',
+        value: pending
+      }
+    ];
+  }, [tasks]);
+
+  // Generate productivity trends (last 4 weeks)
+  const trendData = useMemo(() => {
+    const weeks = ['W1', 'W2', 'W3', 'W4'];
+    const today = new Date();
+    
+    const weeklyTrends = weeks.map((name, index) => {
+      const weekEnd = new Date(today);
+      weekEnd.setDate(today.getDate() - (index * 7));
+      weekEnd.setHours(23, 59, 59, 999);
+      
+      const weekStart = new Date(weekEnd);
+      weekStart.setDate(weekEnd.getDate() - 6);
+      weekStart.setHours(0, 0, 0, 0);
+      
+      const weekTasks = tasks.filter(task => {
+        const taskDate = new Date(task.createdAt);
+        return taskDate >= weekStart && taskDate <= weekEnd;
+      });
+      
+      const completed = weekTasks.filter(t => t.completed).length;
+      const productivity = weekTasks.length > 0 
+        ? Math.round((completed / weekTasks.length) * 100)
+        : 0;
+      
+      return {
+        name: `W${4 - index}`,
+        productivity
+      };
+    }).reverse();
+    
+    return weeklyTrends;
+  }, [tasks]);
+
   return (
     <div className="max-w-5xl mx-auto">
       <header className="mb-6 sm:mb-8 flex items-center justify-between">
