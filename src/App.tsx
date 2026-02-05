@@ -298,6 +298,29 @@ export function App() {
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-[var(--cream)] font-sans text-[var(--black)]">
+      {/* Foreground Notification Banner */}
+      {foregroundNotification && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4 animate-in slide-in-from-top duration-300">
+          <div className="bg-[var(--black)] text-white border-3 border-[var(--teal)] rounded-xl p-4 shadow-[8px_8px_0px_0px_var(--teal)]">
+            <div className="flex items-start gap-3">
+              <div className="bg-[var(--teal)] p-2 rounded-lg flex-shrink-0">
+                <Bell className="w-5 h-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="font-bold text-sm mb-1">{foregroundNotification.title}</h4>
+                <p className="text-xs text-gray-300">{foregroundNotification.body}</p>
+              </div>
+              <button
+                onClick={() => setForegroundNotification(null)}
+                className="text-gray-400 hover:text-white transition-colors flex-shrink-0"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Error Banner */}
       {tasksError && (
         <div className="fixed top-0 left-0 right-0 bg-red-50 border-b border-red-200 p-4 z-50">
