@@ -13,12 +13,37 @@ serviceWorkerRegistration.register({
   },
   onUpdate: (registration) => {
     console.log('[PWA] New content available; please refresh.');
-    // Optionally show a notification to user about update
+    
+    // Prevent multiple update prompts
+    const updatePromptShown = sessionStorage.getItem('updatePromptShown');
+    if (updatePromptShown === 'true') {
+      console.log('[PWA] Update prompt already shown, skipping...');
+      return;
+    }
+    
+    sessionStorage.setItem('updatePromptShown', 'true');
+    
+    // Show update notification
     if (confirm('New version available! Click OK to update.')) {
       if (registration.waiting) {
+        // Tell the waiting service worker to activate
         registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+        
+        // Listen for the controlling service worker to change
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (!refreshing) {
+            refreshing = true;
+            sessionStorage.removeItem('updatePromptShown');
+            window.location.reload();
+          }
+        });
+      } else {
+        sessionStorage.removeItem('updatePromptShown');
+        window.location.reload();
       }
-      window.location.reload();
+    } else {
+      sessionStorage.removeItem('updatePromptShown');
     }
   },
 });
