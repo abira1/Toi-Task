@@ -41,12 +41,55 @@ export function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [adminError, setAdminError] = useState<string | null>(null);
+  const [foregroundNotification, setForegroundNotification] = useState<{
+    title: string;
+    body: string;
+  } | null>(null);
 
   // Use authenticated user or empty user as fallback
   const currentUser = user || emptyUser;
 
   // Check if we're on the admin route
   const isAdminRoute = window.location.pathname === '/admin';
+
+  // Handle foreground notifications
+  useEffect(() => {
+    if (!messaging) return;
+
+    const unsubscribe = onMessage(messaging, (payload) => {
+      console.log('[App] Foreground message received:', payload);
+      
+      // Show in-app notification banner
+      setForegroundNotification({
+        title: payload.notification?.title || 'New Notification',
+        body: payload.notification?.body || ''
+      });
+
+      // Auto-dismiss after 5 seconds
+      setTimeout(() => {
+        setForegroundNotification(null);
+      }, 5000);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Listen for notification clicks from service worker
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type === 'NOTIFICATION_CLICK') {
+        console.log('[App] Notification clicked, taskId:', event.data.taskId);
+        // Navigate to home page where tasks are displayed
+        setCurrentPage('home');
+        // You could add additional logic here to highlight the specific task
+      }
+    };
+
+    navigator.serviceWorker?.addEventListener('message', handleMessage);
+    return () => {
+      navigator.serviceWorker?.removeEventListener('message', handleMessage);
+    };
+  }, []);
 
   // Handle admin login with email verification
   const handleAdminLogin = async () => {
