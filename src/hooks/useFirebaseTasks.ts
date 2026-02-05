@@ -16,7 +16,7 @@ export function useFirebaseTasks(userId?: string) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Load tasks from Firebase Realtime Database
+  // Load ALL tasks from global Firebase collection
   useEffect(() => {
     if (!userId) {
       setTasks([]);
@@ -28,11 +28,12 @@ export function useFirebaseTasks(userId?: string) {
     setError(null);
 
     try {
-      const userTasksRef = ref(database, `users/${userId}/tasks`);
+      // Reference to GLOBAL tasks collection
+      const globalTasksRef = ref(database, 'tasks');
 
       // Listen to real-time changes
       const unsubscribe = onValue(
-        userTasksRef,
+        globalTasksRef,
         (snapshot) => {
           try {
             if (snapshot.exists()) {
@@ -73,8 +74,8 @@ export function useFirebaseTasks(userId?: string) {
 
       return () => {
         unsubscribe();
-        if (userTasksRef) {
-          off(userTasksRef);
+        if (globalTasksRef) {
+          off(globalTasksRef);
         }
       };
     } catch (err) {
@@ -85,8 +86,8 @@ export function useFirebaseTasks(userId?: string) {
     }
   }, [userId]);
 
-  // Add a new task
-  const addTask = async (text: string) => {
+  // Add a new task to global collection
+  const addTask = async (userId: string, text: string) => {
     if (!userId) {
       setError('User not authenticated');
       return;
@@ -94,8 +95,8 @@ export function useFirebaseTasks(userId?: string) {
 
     try {
       setError(null);
-      const userTasksRef = ref(database, `users/${userId}/tasks`);
-      const newTaskRef = push(userTasksRef);
+      const globalTasksRef = ref(database, 'tasks');
+      const newTaskRef = push(globalTasksRef);
 
       const newTask: Task = {
         id: newTaskRef.key || `t${Date.now()}`,
@@ -117,7 +118,7 @@ export function useFirebaseTasks(userId?: string) {
     }
   };
 
-  // Toggle task completion
+  // Toggle task completion (only for task owner)
   const toggleTaskCompletion = async (taskId: string) => {
     if (!userId) {
       setError('User not authenticated');
@@ -126,11 +127,18 @@ export function useFirebaseTasks(userId?: string) {
 
     try {
       setError(null);
-      const taskRef = ref(database, `users/${userId}/tasks/${taskId}`);
+      const taskRef = ref(database, `tasks/${taskId}`);
       const snapshot = await get(taskRef);
 
       if (snapshot.exists()) {
         const currentTask = snapshot.val();
+        
+        // Check if current user is the task owner
+        if (currentTask.userId !== userId) {
+          setError('You can only complete your own tasks');
+          return;
+        }
+
         const newCompletionStatus = !currentTask.completed;
 
         await update(taskRef, {
@@ -146,7 +154,7 @@ export function useFirebaseTasks(userId?: string) {
     }
   };
 
-  // Delete a task
+  // Delete a task (only owner)
   const deleteTask = async (taskId: string) => {
     if (!userId) {
       setError('User not authenticated');
@@ -155,8 +163,20 @@ export function useFirebaseTasks(userId?: string) {
 
     try {
       setError(null);
-      const taskRef = ref(database, `users/${userId}/tasks/${taskId}`);
-      await remove(taskRef);
+      const taskRef = ref(database, `tasks/${taskId}`);
+      const snapshot = await get(taskRef);
+
+      if (snapshot.exists()) {
+        const currentTask = snapshot.val();
+        
+        // Check if current user is the task owner
+        if (currentTask.userId !== userId) {
+          setError('You can only delete your own tasks');
+          return;
+        }
+
+        await remove(taskRef);
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to delete task';
       setError(errorMessage);
@@ -165,8 +185,8 @@ export function useFirebaseTasks(userId?: string) {
     }
   };
 
-  // Add a comment to a task
-  const addComment = async (taskId: string, commentText: string) => {
+  // Add a comment to ANY task (all users can comment on all tasks)
+  const addComment = async (taskId: string, userId: string, text: string) => {
     if (!userId) {
       setError('User not authenticated');
       return;
@@ -174,14 +194,14 @@ export function useFirebaseTasks(userId?: string) {
 
     try {
       setError(null);
-      const commentsRef = ref(database, `users/${userId}/tasks/${taskId}/comments`);
+      const commentsRef = ref(database, `tasks/${taskId}/comments`);
       const newCommentRef = push(commentsRef);
 
       const newComment: Comment = {
         id: newCommentRef.key || `c${Date.now()}`,
         taskId,
         userId,
-        text: commentText,
+        text: text,
         createdAt: new Date().toISOString()
       };
 
@@ -195,7 +215,7 @@ export function useFirebaseTasks(userId?: string) {
     }
   };
 
-  // Delete a comment
+  // Delete a comment (only owner)
   const deleteComment = async (taskId: string, commentId: string) => {
     if (!userId) {
       setError('User not authenticated');
@@ -204,10 +224,7 @@ export function useFirebaseTasks(userId?: string) {
 
     try {
       setError(null);
-      const commentRef = ref(
-        database,
-        `users/${userId}/tasks/${taskId}/comments/${commentId}`
-      );
+      const commentRef = ref(database, `tasks/${taskId}/comments/${commentId}`);
       await remove(commentRef);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to delete comment';
@@ -217,7 +234,7 @@ export function useFirebaseTasks(userId?: string) {
     }
   };
 
-  // Like a task
+  // Like a task (anyone can like)
   const likeTask = async (taskId: string) => {
     if (!userId) {
       setError('User not authenticated');
@@ -226,7 +243,7 @@ export function useFirebaseTasks(userId?: string) {
 
     try {
       setError(null);
-      const taskRef = ref(database, `users/${userId}/tasks/${taskId}`);
+      const taskRef = ref(database, `tasks/${taskId}`);
       const snapshot = await get(taskRef);
 
       if (snapshot.exists()) {
@@ -245,7 +262,7 @@ export function useFirebaseTasks(userId?: string) {
     }
   };
 
-  // Update task text
+  // Update task text (only owner)
   const updateTask = async (taskId: string, newText: string) => {
     if (!userId) {
       setError('User not authenticated');
@@ -254,10 +271,22 @@ export function useFirebaseTasks(userId?: string) {
 
     try {
       setError(null);
-      const taskRef = ref(database, `users/${userId}/tasks/${taskId}`);
-      await update(taskRef, {
-        text: newText
-      });
+      const taskRef = ref(database, `tasks/${taskId}`);
+      const snapshot = await get(taskRef);
+
+      if (snapshot.exists()) {
+        const currentTask = snapshot.val();
+        
+        // Check if current user is the task owner
+        if (currentTask.userId !== userId) {
+          setError('You can only edit your own tasks');
+          return;
+        }
+
+        await update(taskRef, {
+          text: newText
+        });
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to update task';
       setError(errorMessage);
@@ -266,43 +295,9 @@ export function useFirebaseTasks(userId?: string) {
     }
   };
 
-  // Get all tasks across all users (for team view)
-  const getAllTeamTasks = async (userIds: string[]): Promise<Task[]> => {
-    try {
-      setError(null);
-      const allTasks: Task[] = [];
-
-      for (const uid of userIds) {
-        const userTasksRef = ref(database, `users/${uid}/tasks`);
-        const snapshot = await get(userTasksRef);
-
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          const tasksArray: Task[] = Object.entries(data).map(
-            ([id, taskData]: [string, any]) => ({
-              id,
-              ...taskData,
-              comments: taskData.comments ? Object.values(taskData.comments) : [],
-              likes: taskData.likes || 0,
-              completed: taskData.completed || false
-            })
-          );
-          allTasks.push(...tasksArray);
-        }
-      }
-
-      // Sort by createdAt in descending order
-      allTasks.sort((a, b) => 
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-
-      return allTasks;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load team tasks';
-      setError(errorMessage);
-      console.error('Get team tasks error:', err);
-      return [];
-    }
+  // Get all tasks across all users (for team view) - Now just returns the tasks we already have
+  const getAllTeamTasks = async (): Promise<Task[]> => {
+    return tasks;
   };
 
   return {
