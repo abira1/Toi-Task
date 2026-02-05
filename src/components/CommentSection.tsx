@@ -32,6 +32,16 @@ export function CommentSection({
       <div className="space-y-3 mb-4">
         {comments.map((comment) => {
           const author = getAuthor(comment.userId);
+          
+          // Debug logging for missing authors
+          if (!author && comment.userId) {
+            console.log('CommentSection: Could not find author for comment', {
+              commentId: comment.id,
+              commentUserId: comment.userId,
+              availableMembers: teamMembers.map(m => ({ id: m.id, firebaseUid: m.firebaseUid, email: m.email }))
+            });
+          }
+          
           const authorAvatar =
           author?.avatar ||
           'https://ui-avatars.com/api/?name=Unknown&background=9ca3af&color=fff';
