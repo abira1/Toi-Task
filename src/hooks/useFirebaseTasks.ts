@@ -249,6 +249,42 @@ export function useFirebaseTasks(userId?: string) {
       };
 
       await update(newCommentRef, newComment);
+      
+      // Send notification to task owner (if commenter is not the owner)
+      // Fire and forget - don't wait for notification to complete
+      (async () => {
+        try {
+          // Get the task to find the owner
+          const taskRef = ref(database, `tasks/${taskId}`);
+          const taskSnapshot = await get(taskRef);
+          
+          if (taskSnapshot.exists()) {
+            const task = taskSnapshot.val();
+            const ownerId = task.userId;
+            
+            // Don't notify if owner is commenting on their own task
+            if (ownerId !== userId) {
+              const ownerToken = await getUserFCMToken(ownerId);
+              const commenterName = await getUserName(userId);
+              
+              if (ownerToken) {
+                await sendNotificationToUser(
+                  ownerToken,
+                  'New Comment',
+                  `${commenterName} comment on your task`,
+                  { taskId: taskId, type: 'comment_added' }
+                );
+              } else {
+                console.log('[Task] Task owner has no FCM token');
+              }
+            }
+          }
+        } catch (error) {
+          console.error('[Task] Failed to send comment notification:', error);
+          // Don't throw - notifications are non-critical
+        }
+      })();
+      
       return newComment;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to add comment';
