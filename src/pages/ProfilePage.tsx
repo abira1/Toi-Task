@@ -1,6 +1,7 @@
 import React, { useState, Fragment } from 'react';
 import { User, Task } from '../types';
 import { Blob2, Squiggle } from '../components/IllustrationElements';
+import { NotificationSettings } from '../components/NotificationSettings';
 import {
   Trophy,
   Flame,
