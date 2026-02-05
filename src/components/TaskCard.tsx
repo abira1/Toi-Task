@@ -25,7 +25,22 @@ export function TaskCard({
   const [showFullText, setShowFullText] = useState(false);
   const [isTruncated, setIsTruncated] = useState(false);
   const textRef = useRef<HTMLParagraphElement>(null);
-  const author = teamMembers.find((u) => u.id === task.userId);
+  
+  // Try to find author by ID first, then fallback to Firebase UID for backward compatibility
+  const author = teamMembers.find((u) => u.id === task.userId) || 
+                 teamMembers.find((u) => u.firebaseUid === task.userId);
+  
+  // Log for debugging
+  useEffect(() => {
+    if (!author && task.userId) {
+      console.log('TaskCard: Could not find author for task', {
+        taskId: task.id,
+        taskUserId: task.userId,
+        availableMembers: teamMembers.map(m => ({ id: m.id, firebaseUid: m.firebaseUid, email: m.email }))
+      });
+    }
+  }, [author, task.userId, task.id, teamMembers]);
+  
   const isOwnTask = task.userId === currentUserId;
   // Check if text is truncated
   useEffect(() => {
