@@ -82,7 +82,7 @@ export function useFirebaseAuth() {
             if (memberData) {
               // User is authorized - sync with teamMember data
               const userData: User = {
-                id: firebaseUser.uid,
+                id: memberData.id || firebaseUser.uid,
                 name: memberData.name || firebaseUser.displayName || 'User',
                 email: firebaseUser.email || '',
                 role: memberData.role || 'Team Member',
@@ -168,7 +168,7 @@ export function useFirebaseAuth() {
           setIsAuthorized(true);
 
           const userData: User = {
-            id: result.user.uid,
+            id: memberData.id || result.user.uid,
             name: memberData.name || result.user.displayName || 'User',
             email: userEmail || '',
             role: memberData.role || 'Team Member',
