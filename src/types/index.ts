@@ -12,6 +12,7 @@ export interface User {
     streak: number;
     points: number;
   };
+  firebaseUid?: string; // Store Firebase UID for backward compatibility with old tasks
 }
 
 export interface Comment {
