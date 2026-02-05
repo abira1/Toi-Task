@@ -47,6 +47,7 @@ export async function getUserName(userId: string): Promise<string> {
 
 /**
  * Send notification to a single user using FCM REST API
+ * Note: This may be blocked by CORS in browsers. For production, use Firebase Cloud Functions.
  */
 export async function sendNotificationToUser(
   fcmToken: string,
@@ -55,6 +56,11 @@ export async function sendNotificationToUser(
   data?: any
 ): Promise<boolean> {
   try {
+    console.log('[Notification] Attempting to send notification...');
+    console.log('[Notification] Token (first 20 chars):', fcmToken.substring(0, 20) + '...');
+    console.log('[Notification] Title:', title);
+    console.log('[Notification] Body:', body);
+    
     const response = await fetch('https://fcm.googleapis.com/fcm/send', {
       method: 'POST',
       headers: {
@@ -76,15 +82,28 @@ export async function sendNotificationToUser(
 
     if (response.ok) {
       const result = await response.json();
-      console.log('[Notification] Sent successfully:', result);
+      console.log('[Notification] ✅ Sent successfully:', result);
       return true;
     } else {
       const errorText = await response.text();
-      console.error('[Notification] Failed to send:', response.status, errorText);
+      console.error('[Notification] ❌ Failed to send:', response.status, errorText);
+      
+      // Check if it's a CORS error
+      if (response.status === 0) {
+        console.error('[Notification] ⚠️ CORS Error: FCM API blocked by browser. Need backend/Cloud Functions.');
+      }
+      
       return false;
     }
   } catch (error) {
-    console.error('[Notification] Error sending notification:', error);
+    console.error('[Notification] ❌ Error sending notification:', error);
+    
+    // Check if it's a CORS error
+    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+      console.error('[Notification] ⚠️ CORS Error: Cannot call FCM API directly from browser.');
+      console.error('[Notification] 💡 Solution: Use Firebase Cloud Functions or backend API endpoint.');
+    }
+    
     return false;
   }
 }
