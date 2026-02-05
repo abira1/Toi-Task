@@ -83,6 +83,7 @@ export function useFirebaseAuth() {
               // User is authorized - sync with teamMember data
               const userData: User = {
                 id: memberData.id || firebaseUser.uid,
+                firebaseUid: firebaseUser.uid, // Store Firebase UID for backward compatibility
                 name: memberData.name || firebaseUser.displayName || 'User',
                 email: firebaseUser.email || '',
                 role: memberData.role || 'Team Member',
@@ -169,6 +170,7 @@ export function useFirebaseAuth() {
 
           const userData: User = {
             id: memberData.id || result.user.uid,
+            firebaseUid: result.user.uid, // Store Firebase UID for backward compatibility
             name: memberData.name || result.user.displayName || 'User',
             email: userEmail || '',
             role: memberData.role || 'Team Member',
