@@ -25,6 +25,15 @@ export function HomePage({
 }: HomePageProps) {
   const [isAddingTask, setIsAddingTask] = useState(false);
 
+  // Ensure current user is in teamMembers list for display purposes
+  const allMembers = React.useMemo(() => {
+    const hasCurrentUser = teamMembers.some(m => m.id === currentUser.id);
+    if (!hasCurrentUser && currentUser.id) {
+      return [...teamMembers, currentUser];
+    }
+    return teamMembers;
+  }, [teamMembers, currentUser]);
+
   // Filter for today's tasks only
   const todayTasks = tasks.filter((t) => {
     const date = new Date(t.createdAt);
