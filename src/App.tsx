@@ -145,7 +145,7 @@ export function App() {
 
   // Main App - requires authentication
   if (!isAuthenticated) {
-    return <LoginPage onLogin={async () => {}} />;
+    return <LoginPage onLogin={async () => { /* Auth handled by Firebase */ }} />;
   }
 
   // Check if user is authenticated but NOT authorized (not in teamMembers)
