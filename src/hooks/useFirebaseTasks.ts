@@ -10,6 +10,12 @@ import {
 } from 'firebase/database';
 import { database } from '../firebase';
 import { Task, Comment } from '../types';
+import { 
+  notifyAllTeamExcept, 
+  getUserFCMToken, 
+  sendNotificationToUser, 
+  getUserName 
+} from '../services/notificationService';
 
 export function useFirebaseTasks(userId?: string) {
   const [tasks, setTasks] = useState<Task[]>([]);
