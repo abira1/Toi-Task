@@ -228,6 +228,15 @@ export function ProfilePage({
           </div>
         </div>
 
+        {/* Notifications Section */}
+        <div>
+          <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4 flex items-center gap-2">
+            <span className="bg-[var(--mustard)] w-2 h-5 sm:h-6 rounded-full block"></span>
+            Notifications
+          </h3>
+          <NotificationSettings userId={user.id} />
+        </div>
+
         {/* Account Section */}
         <div>
           <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4 flex items-center gap-2">
