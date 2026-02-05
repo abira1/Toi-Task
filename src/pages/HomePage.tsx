@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { User, Task } from '../types';
 import { AddTaskForm } from '../components/AddTaskForm';
 import { TaskCard } from '../components/TaskCard';
