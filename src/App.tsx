@@ -268,6 +268,9 @@ export function App() {
       <main className="flex-1 p-4 md:p-8 pb-24 md:pb-8 overflow-y-auto min-h-screen">
         <div className="max-w-7xl mx-auto">{renderPage()}</div>
       </main>
+
+      {/* PWA Install Prompt */}
+      <InstallPrompt />
     </div>
   );
 }
