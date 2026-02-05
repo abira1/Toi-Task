@@ -9,6 +9,7 @@ import { ProfilePage } from './pages/ProfilePage';
 import { AdminPage } from './pages/AdminPage';
 import { AdminLoginPage } from './pages/AdminLoginPage';
 import { Sidebar } from './components/Sidebar';
+import { InstallPrompt } from './components/InstallPrompt';
 import { Page, User } from './types';
 import { LogOut, AlertCircle } from 'lucide-react';
 
