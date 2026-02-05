@@ -115,6 +115,24 @@ export function useFirebaseTasks(userId?: string) {
       };
 
       await update(newTaskRef, newTask);
+      
+      // Send notification to all team members except the creator
+      // Fire and forget - don't wait for notification to complete
+      (async () => {
+        try {
+          const userName = await getUserName(userId);
+          await notifyAllTeamExcept(
+            [userId], // Exclude the creator
+            'New Task Created',
+            `${userName} Added a New task`,
+            { taskId: newTask.id, type: 'task_created' }
+          );
+        } catch (error) {
+          console.error('[Task] Failed to send task creation notification:', error);
+          // Don't throw - notifications are non-critical
+        }
+      })();
+      
       return newTask;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to add task';
