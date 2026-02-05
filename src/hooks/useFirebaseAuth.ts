@@ -60,6 +60,7 @@ export function useFirebaseAuth() {
             // Admin can access without being in teamMembers
             const userData: User = {
               id: firebaseUser.uid,
+              firebaseUid: firebaseUser.uid,
               name: firebaseUser.displayName || 'Admin',
               email: firebaseUser.email || '',
               role: 'admin',
@@ -143,6 +144,7 @@ export function useFirebaseAuth() {
 
         const userData: User = {
           id: result.user.uid,
+          firebaseUid: result.user.uid,
           name: result.user.displayName || 'Admin',
           email: userEmail || '',
           role: 'admin',
