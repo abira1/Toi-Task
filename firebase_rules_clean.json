@@ -1,0 +1,29 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "auth.uid === $uid",
+        ".write": "auth.uid === $uid"
+      }
+    },
+    "tasks": {
+      ".read": "auth != null",
+      ".indexOn": ["createdAt", "userId"],
+      "$taskId": {
+        ".write": "auth != null && (!data.exists() || data.child('userId').val() === auth.uid)",
+        "comments": {
+          ".read": "auth != null",
+          ".write": "auth != null"
+        }
+      }
+    },
+    "teamMembers": {
+      ".read": "auth != null",
+      ".write": "root.child('admins').child(auth.uid).exists() === true"
+    },
+    "admins": {
+      ".read": false,
+      ".write": false
+    }
+  }
+}
