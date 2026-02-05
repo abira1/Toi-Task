@@ -22,7 +22,11 @@ export function CommentSection({
       setNewComment('');
     }
   };
-  const getAuthor = (userId: string) => teamMembers.find((u) => u.id === userId);
+  
+  // Dual lookup: try memberData.id first, then fallback to firebaseUid for backward compatibility
+  const getAuthor = (userId: string) => 
+    teamMembers.find((u) => u.id === userId) || 
+    teamMembers.find((u) => u.firebaseUid === userId);
   return (
     <div className="mt-4 pt-4 border-t-2 border-dashed border-gray-200 animate-in slide-in-from-top-2 duration-300">
       <div className="space-y-3 mb-4">
