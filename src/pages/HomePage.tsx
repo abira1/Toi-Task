@@ -92,7 +92,7 @@ export function HomePage({
               key={task.id}
               task={task}
               currentUserId={currentUser.id}
-              teamMembers={teamMembers}
+              teamMembers={allMembers}
               onToggleComplete={toggleTaskCompletion}
               onAddComment={(taskId, text) => addComment(taskId, currentUser.id, text)}
               onLike={likeTask}
