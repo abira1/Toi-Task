@@ -169,6 +169,25 @@ export function useFirebaseTasks(userId?: string) {
           completed: newCompletionStatus,
           completedAt: newCompletionStatus ? new Date().toISOString() : null
         });
+        
+        // Send notification only when marking as complete (not uncomplete)
+        if (newCompletionStatus) {
+          // Fire and forget - don't wait for notification to complete
+          (async () => {
+            try {
+              const userName = await getUserName(userId);
+              await notifyAllTeamExcept(
+                [userId], // Exclude the completer
+                'Task Completed',
+                `${userName} mark a task done`,
+                { taskId: taskId, type: 'task_completed' }
+              );
+            } catch (error) {
+              console.error('[Task] Failed to send task completion notification:', error);
+              // Don't throw - notifications are non-critical
+            }
+          })();
+        }
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to update task';
