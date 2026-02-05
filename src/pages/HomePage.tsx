@@ -60,11 +60,11 @@ export function HomePage({
     <div className="max-w-3xl mx-auto">
       <header className="mb-6 sm:mb-8 relative">
         <h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-[var(--black)] mb-1 sm:mb-2">
-          Today's Mission
+          Team Task Feed
         </h1>
         <p className="text-base sm:text-xl text-gray-500 font-medium">
           {totalCount > 0
-            ? `${completedCount}/${totalCount} tasks completed! 💪`
+            ? `${completedCount}/${totalCount} team tasks completed today! 💪`
             : "Let's make it happen! 💪"}
         </p>
         <Squiggle className="absolute -top-4 sm:-top-6 right-0 w-20 sm:w-32 text-[var(--mustard)] transform rotate-6 hidden sm:block" />
