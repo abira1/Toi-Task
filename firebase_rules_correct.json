@@ -1,0 +1,36 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "auth.uid === $uid",
+        ".write": "auth.uid === $uid",
+        ".indexOn": ["createdAt", "completedAt"],
+        "profile": {
+          ".read": true,
+          ".write": "auth.uid === $uid"
+        }
+      }
+    },
+    "tasks": {
+      ".read": "auth != null",
+      ".indexOn": ["createdAt", "completed", "completedAt", "userId"],
+      "$taskId": {
+        ".write": "auth != null && (!data.exists() || data.child('userId').val() === auth.uid)",
+        "comments": {
+          ".read": "auth != null",
+          ".write": "auth != null",
+          ".indexOn": ["createdAt"]
+        }
+      }
+    },
+    "teamMembers": {
+      ".read": true,
+      ".write": "root.child('admins').child(auth.uid).exists() === true",
+      ".indexOn": ["createdAt", "email"]
+    },
+    "admins": {
+      ".read": false,
+      ".write": false
+    }
+  }
+}
