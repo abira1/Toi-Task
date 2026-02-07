@@ -209,6 +209,20 @@ export function App() {
   }
 
   const renderPage = () => {
+    // If a member is selected and we're on team page, show member detail
+    if (selectedMemberId && currentPage === 'team') {
+      const selectedMember = teamMembers.find(m => m.id === selectedMemberId);
+      if (selectedMember) {
+        return (
+          <MemberDetailPage
+            member={selectedMember}
+            tasks={tasks}
+            onBack={() => setSelectedMemberId(null)}
+          />
+        );
+      }
+    }
+
     switch (currentPage) {
       case 'home':
         return (
@@ -225,6 +239,15 @@ export function App() {
 
       case 'overview':
         return <OverviewPage tasks={tasks} teamMembers={teamMembers} />;
+      
+      case 'team':
+        return (
+          <TeamPage
+            teamMembers={teamMembers}
+            onMemberClick={(memberId) => setSelectedMemberId(memberId)}
+          />
+        );
+      
       case 'profile':
         return (
           <ProfilePage
