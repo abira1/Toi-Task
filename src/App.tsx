@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { onMessage } from 'firebase/messaging';
-import { messaging } from './firebase';
 import { useFirebaseAuth } from './hooks/useFirebaseAuth';
 import { useFirebaseTasks } from './hooks/useFirebaseTasks';
 import { useFirebaseTeamMembers } from './hooks/useFirebaseTeamMembers';
@@ -11,9 +9,8 @@ import { ProfilePage } from './pages/ProfilePage';
 import { AdminPage } from './pages/AdminPage';
 import { AdminLoginPage } from './pages/AdminLoginPage';
 import { Sidebar } from './components/Sidebar';
-import { InstallPrompt } from './components/InstallPrompt';
 import { Page, User } from './types';
-import { LogOut, AlertCircle, Bell, X } from 'lucide-react';
+import { LogOut, AlertCircle } from 'lucide-react';
 
 const LOGO_URL = 'https://i.postimg.cc/bw1Ww0m0/Toi-Task-(1).png';
 

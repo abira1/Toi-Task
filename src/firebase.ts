@@ -2,7 +2,6 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { getDatabase } from 'firebase/database';
 import { getAnalytics } from 'firebase/analytics';
-import { getMessaging, isSupported } from 'firebase/messaging';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -30,28 +29,6 @@ export const googleProvider = new GoogleAuthProvider();
 
 // Initialize Analytics
 export const analytics = getAnalytics(app);
-
-// Initialize Firebase Cloud Messaging (with feature detection)
-let messaging: ReturnType<typeof getMessaging> | null = null;
-try {
-  // Check if messaging is supported in this browser
-  if (typeof window !== 'undefined' && 'Notification' in window) {
-    isSupported().then((supported) => {
-      if (supported) {
-        messaging = getMessaging(app);
-        console.log('[Firebase] Messaging initialized');
-      } else {
-        console.warn('[Firebase] Messaging not supported in this browser');
-      }
-    }).catch((err) => {
-      console.warn('[Firebase] Error checking messaging support:', err);
-    });
-  }
-} catch (err) {
-  console.warn('[Firebase] Messaging initialization failed:', err);
-}
-
-export { messaging };
 
 // Allowed admin emails
 export const ALLOWED_ADMIN_EMAILS = [
