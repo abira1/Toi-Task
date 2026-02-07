@@ -38,55 +38,12 @@ export function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [adminError, setAdminError] = useState<string | null>(null);
-  const [foregroundNotification, setForegroundNotification] = useState<{
-    title: string;
-    body: string;
-  } | null>(null);
 
   // Use authenticated user or empty user as fallback
   const currentUser = user || emptyUser;
 
   // Check if we're on the admin route
   const isAdminRoute = window.location.pathname === '/admin';
-
-  // Handle foreground notifications
-  useEffect(() => {
-    if (!messaging) return;
-
-    const unsubscribe = onMessage(messaging, (payload) => {
-      console.log('[App] Foreground message received:', payload);
-      
-      // Show in-app notification banner
-      setForegroundNotification({
-        title: payload.notification?.title || 'New Notification',
-        body: payload.notification?.body || ''
-      });
-
-      // Auto-dismiss after 5 seconds
-      setTimeout(() => {
-        setForegroundNotification(null);
-      }, 5000);
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  // Listen for notification clicks from service worker
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      if (event.data?.type === 'NOTIFICATION_CLICK') {
-        console.log('[App] Notification clicked, taskId:', event.data.taskId);
-        // Navigate to home page where tasks are displayed
-        setCurrentPage('home');
-        // You could add additional logic here to highlight the specific task
-      }
-    };
-
-    navigator.serviceWorker?.addEventListener('message', handleMessage);
-    return () => {
-      navigator.serviceWorker?.removeEventListener('message', handleMessage);
-    };
-  }, []);
 
   // Handle admin login with email verification
   const handleAdminLogin = async () => {
@@ -295,29 +252,6 @@ export function App() {
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-[var(--cream)] font-sans text-[var(--black)]">
-      {/* Foreground Notification Banner */}
-      {foregroundNotification && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4 animate-in slide-in-from-top duration-300">
-          <div className="bg-[var(--black)] text-white border-3 border-[var(--teal)] rounded-xl p-4 shadow-[8px_8px_0px_0px_var(--teal)]">
-            <div className="flex items-start gap-3">
-              <div className="bg-[var(--teal)] p-2 rounded-lg flex-shrink-0">
-                <Bell className="w-5 h-5" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="font-bold text-sm mb-1">{foregroundNotification.title}</h4>
-                <p className="text-xs text-gray-300">{foregroundNotification.body}</p>
-              </div>
-              <button
-                onClick={() => setForegroundNotification(null)}
-                className="text-gray-400 hover:text-white transition-colors flex-shrink-0"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Error Banner */}
       {tasksError && (
         <div className="fixed top-0 left-0 right-0 bg-red-50 border-b border-red-200 p-4 z-50">
@@ -333,9 +267,6 @@ export function App() {
       <main className="flex-1 p-4 md:p-8 pb-24 md:pb-8 overflow-y-auto min-h-screen">
         <div className="max-w-7xl mx-auto">{renderPage()}</div>
       </main>
-
-      {/* PWA Install Prompt */}
-      <InstallPrompt />
     </div>
   );
 }
