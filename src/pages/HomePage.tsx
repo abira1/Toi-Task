@@ -78,7 +78,7 @@ export function HomePage({
         </h1>
         <p className="text-base sm:text-xl text-gray-500 font-medium">
           {totalCount > 0
-            ? `${completedCount}/${totalCount} team tasks completed today! 💪`
+            ? `${completedCount}/${totalCount} tasks completed! 💪`
             : "Let's make it happen! 💪"}
         </p>
         <Squiggle className="absolute -top-4 sm:-top-6 right-0 w-20 sm:w-32 text-[var(--mustard)] transform rotate-6 hidden sm:block" />
