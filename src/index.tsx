@@ -8,6 +8,10 @@ const container = document.getElementById("root");
 const root = createRoot(container!);
 root.render(<App />);
 
+// Track if we've already shown an update prompt in this session
+let updatePromptShown = false;
+let isRefreshing = false;
+
 // Register service worker for PWA
 serviceWorkerRegistration.register({
   onSuccess: () => {
@@ -16,36 +20,51 @@ serviceWorkerRegistration.register({
   onUpdate: (registration) => {
     console.log('[PWA] New content available; please refresh.');
     
-    // Prevent multiple update prompts
-    const updatePromptShown = sessionStorage.getItem('updatePromptShown');
-    if (updatePromptShown === 'true') {
-      console.log('[PWA] Update prompt already shown, skipping...');
+    // Prevent multiple update prompts in the same session
+    if (updatePromptShown) {
+      console.log('[PWA] Update prompt already shown in this session, skipping...');
       return;
     }
     
-    sessionStorage.setItem('updatePromptShown', 'true');
+    // Mark that we've shown the prompt
+    updatePromptShown = true;
     
-    // Show update notification
-    if (confirm('New version available! Click OK to update.')) {
-      if (registration.waiting) {
-        // Tell the waiting service worker to activate
-        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-        
-        // Listen for the controlling service worker to change
-        let refreshing = false;
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-          if (!refreshing) {
-            refreshing = true;
-            sessionStorage.removeItem('updatePromptShown');
+    // Use a timeout to ensure we don't show the prompt immediately on page load
+    setTimeout(() => {
+      // Show update notification
+      if (confirm('New version available! Click OK to update.')) {
+        if (registration.waiting) {
+          // Tell the waiting service worker to activate
+          registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+          
+          // Listen for the controlling service worker to change (only once)
+          const handleControllerChange = () => {
+            if (!isRefreshing) {
+              isRefreshing = true;
+              window.location.reload();
+            }
+          };
+          
+          navigator.serviceWorker.addEventListener('controllerchange', handleControllerChange, { once: true });
+          
+          // If controllerchange doesn't fire within 3 seconds, reload anyway
+          setTimeout(() => {
+            if (!isRefreshing) {
+              isRefreshing = true;
+              window.location.reload();
+            }
+          }, 3000);
+        } else {
+          // No waiting worker, just reload
+          if (!isRefreshing) {
+            isRefreshing = true;
             window.location.reload();
           }
-        });
+        }
       } else {
-        sessionStorage.removeItem('updatePromptShown');
-        window.location.reload();
+        // User declined update, reset the flag so they can be prompted again later
+        updatePromptShown = false;
       }
-    } else {
-      sessionStorage.removeItem('updatePromptShown');
-    }
+    }, 500);
   },
 });
