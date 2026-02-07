@@ -45,6 +45,21 @@ export function HomePage({
     );
   });
 
+  // Filter out completed tasks older than 12 hours
+  const visibleTasks = todayTasks.filter((t) => {
+    if (!t.completed || !t.completedAt) {
+      return true; // Show all non-completed tasks
+    }
+    
+    // Calculate hours since completion
+    const completedTime = new Date(t.completedAt).getTime();
+    const currentTime = new Date().getTime();
+    const hoursSinceCompletion = (currentTime - completedTime) / (1000 * 60 * 60);
+    
+    // Hide if completed more than 12 hours ago
+    return hoursSinceCompletion < 12;
+  });
+
   // Sort: Incomplete first, then by creation time (newest first)
   const sortedTodayTasks = [...todayTasks].sort((a, b) => {
     if (a.completed === b.completed) {
