@@ -61,15 +61,15 @@ export function HomePage({
   });
 
   // Sort: Incomplete first, then by creation time (newest first)
-  const sortedTodayTasks = [...todayTasks].sort((a, b) => {
+  const sortedTodayTasks = [...visibleTasks].sort((a, b) => {
     if (a.completed === b.completed) {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     }
     return a.completed ? 1 : -1;
   });
 
-  const completedCount = todayTasks.filter((t) => t.completed).length;
-  const totalCount = todayTasks.length;
+  const completedCount = visibleTasks.filter((t) => t.completed).length;
+  const totalCount = visibleTasks.length;
 
   const handleAddTask = async (text: string) => {
     try {
