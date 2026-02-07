@@ -59,21 +59,21 @@ export function TeamPage({ teamMembers, onMemberClick }: TeamPageProps) {
                 <Trophy className="w-4 h-4 text-[var(--teal)] mx-auto mb-1" />
                 <p className="text-xs font-bold text-gray-500">Points</p>
                 <p className="text-sm sm:text-base font-black text-[var(--black)]">
-                  {member.stats.points}
+                  {member.stats?.points || 0}
                 </p>
               </div>
               <div className="bg-[var(--cream-light)] border-2 border-[var(--black)] rounded-lg p-2 text-center">
                 <Flame className="w-4 h-4 text-[var(--coral)] mx-auto mb-1" />
                 <p className="text-xs font-bold text-gray-500">Streak</p>
                 <p className="text-sm sm:text-base font-black text-[var(--black)]">
-                  {member.stats.streak}d
+                  {member.stats?.streak || 0}d
                 </p>
               </div>
               <div className="bg-[var(--cream-light)] border-2 border-[var(--black)] rounded-lg p-2 text-center">
                 <Target className="w-4 h-4 text-[var(--mustard)] mx-auto mb-1" />
                 <p className="text-xs font-bold text-gray-500">Done</p>
                 <p className="text-sm sm:text-base font-black text-[var(--black)]">
-                  {member.stats.tasksCompleted}
+                  {member.stats?.tasksCompleted || 0}
                 </p>
               </div>
             </div>
