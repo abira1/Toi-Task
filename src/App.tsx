@@ -6,6 +6,8 @@ import { LoginPage } from './pages/LoginPage';
 import { HomePage } from './pages/HomePage';
 import { OverviewPage } from './pages/OverviewPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { TeamPage } from './pages/TeamPage';
+import { MemberDetailPage } from './pages/MemberDetailPage';
 import { AdminPage } from './pages/AdminPage';
 import { AdminLoginPage } from './pages/AdminLoginPage';
 import { Sidebar } from './components/Sidebar';
