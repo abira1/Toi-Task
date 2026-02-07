@@ -80,18 +80,24 @@ export function TeamPage({ teamMembers, onMemberClick }: TeamPageProps) {
 
             {/* Expertise Tags */}
             <div className="flex flex-wrap gap-1.5 justify-center">
-              {member.expertise.slice(0, 3).map((skill, i) => (
-                <span
-                  key={i}
-                  className="px-2 py-1 bg-[var(--black)] text-white rounded-md font-bold text-xs"
-                >
-                  {skill}
-                </span>
-              ))}
-              {member.expertise.length > 3 && (
-                <span className="px-2 py-1 bg-gray-200 text-gray-600 rounded-md font-bold text-xs">
-                  +{member.expertise.length - 3}
-                </span>
+              {member.expertise && member.expertise.length > 0 ? (
+                <>
+                  {member.expertise.slice(0, 3).map((skill, i) => (
+                    <span
+                      key={i}
+                      className="px-2 py-1 bg-[var(--black)] text-white rounded-md font-bold text-xs"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                  {member.expertise.length > 3 && (
+                    <span className="px-2 py-1 bg-gray-200 text-gray-600 rounded-md font-bold text-xs">
+                      +{member.expertise.length - 3}
+                    </span>
+                  )}
+                </>
+              ) : (
+                <span className="text-xs text-gray-400 italic">No expertise listed</span>
               )}
             </div>
 
