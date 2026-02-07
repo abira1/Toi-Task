@@ -47,15 +47,3 @@ serviceWorkerRegistration.register({
     }
   },
 });
-
-// Register Firebase Messaging Service Worker
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker
-    .register('/firebase-messaging-sw.js')
-    .then((registration) => {
-      console.log('[FCM] Service Worker registered:', registration);
-    })
-    .catch((error) => {
-      console.error('[FCM] Service Worker registration failed:', error);
-    });
-}
