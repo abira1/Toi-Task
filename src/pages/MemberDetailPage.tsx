@@ -153,14 +153,18 @@ export function MemberDetailPage({ member, tasks, onBack }: MemberDetailPageProp
             Expertise
           </h3>
           <div className="flex flex-wrap gap-2">
-            {member.expertise.map((skill, i) => (
-              <span
-                key={i}
-                className="px-3 sm:px-4 py-1.5 sm:py-2 bg-[var(--black)] text-white rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm"
-              >
-                {skill}
-              </span>
-            ))}
+            {member.expertise && member.expertise.length > 0 ? (
+              member.expertise.map((skill, i) => (
+                <span
+                  key={i}
+                  className="px-3 sm:px-4 py-1.5 sm:py-2 bg-[var(--black)] text-white rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm"
+                >
+                  {skill}
+                </span>
+              ))
+            ) : (
+              <span className="text-sm text-gray-400 italic">No expertise listed</span>
+            )}
           </div>
         </div>
 
