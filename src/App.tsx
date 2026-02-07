@@ -38,6 +38,7 @@ export function App() {
   const { teamMembers, addTeamMember, isAdmin: isAdminUser } = useFirebaseTeamMembers(isAdmin);
   
   const [currentPage, setCurrentPage] = useState<Page>('home');
+  const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [adminError, setAdminError] = useState<string | null>(null);
 
