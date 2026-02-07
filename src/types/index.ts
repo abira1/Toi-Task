@@ -34,4 +34,4 @@ export interface Task {
   likes: number;
 }
 
-export type Page = 'login' | 'home' | 'overview' | 'profile';
+export type Page = 'login' | 'home' | 'overview' | 'profile' | 'team';
