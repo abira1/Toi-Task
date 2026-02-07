@@ -1,7 +1,6 @@
 import React from 'react';
 import { User } from '../types';
 import { Squiggle } from '../components/IllustrationElements';
-import { Trophy, Flame, Target } from 'lucide-react';
 
 interface TeamPageProps {
   teamMembers: User[];
