@@ -1,7 +1,6 @@
 import React, { useState, Fragment } from 'react';
 import { User, Task } from '../types';
 import { Blob2, Squiggle } from '../components/IllustrationElements';
-import { NotificationSettings } from '../components/NotificationSettings';
 import {
   Trophy,
   Flame,
@@ -226,15 +225,6 @@ export function ProfilePage({
               </div>
             }
           </div>
-        </div>
-
-        {/* Notifications Section */}
-        <div>
-          <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4 flex items-center gap-2">
-            <span className="bg-[var(--mustard)] w-2 h-5 sm:h-6 rounded-full block"></span>
-            Notifications
-          </h3>
-          <NotificationSettings userId={user.id} />
         </div>
 
         {/* Account Section */}
