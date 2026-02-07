@@ -34,24 +34,14 @@ export function HomePage({
     return teamMembers;
   }, [teamMembers, currentUser]);
 
-  // Filter for today's tasks only
-  const todayTasks = tasks.filter((t) => {
-    const date = new Date(t.createdAt);
-    const today = new Date();
-    return (
-      date.getDate() === today.getDate() &&
-      date.getMonth() === today.getMonth() &&
-      date.getFullYear() === today.getFullYear()
-    );
-  });
-
-  // Filter out completed tasks older than 12 hours
-  const visibleTasks = todayTasks.filter((t) => {
+  // Show all tasks, but filter out completed tasks older than 12 hours
+  const visibleTasks = tasks.filter((t) => {
+    // Show all non-completed tasks
     if (!t.completed || !t.completedAt) {
-      return true; // Show all non-completed tasks
+      return true;
     }
     
-    // Calculate hours since completion
+    // For completed tasks, check if they were completed within the last 12 hours
     const completedTime = new Date(t.completedAt).getTime();
     const currentTime = new Date().getTime();
     const hoursSinceCompletion = (currentTime - completedTime) / (1000 * 60 * 60);
