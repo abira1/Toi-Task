@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, PieChart, User } from 'lucide-react';
+import { Home, PieChart, User, Users } from 'lucide-react';
 import { Page } from '../types';
 import { Blob1 } from './IllustrationElements';
 const LOGO_URL = 'https://i.postimg.cc/bw1Ww0m0/Toi-Task-(1).png';
@@ -18,6 +18,11 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
     id: 'overview',
     label: 'Overview',
     icon: PieChart
+  },
+  {
+    id: 'team',
+    label: 'Team',
+    icon: Users
   },
   {
     id: 'profile',
