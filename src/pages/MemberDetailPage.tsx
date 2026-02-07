@@ -21,15 +21,15 @@ export function MemberDetailPage({ member, tasks, onBack }: MemberDetailPageProp
   const profileStats = [
     {
       label: 'Points',
-      value: member.stats.points.toLocaleString(),
-      shortValue: `${member.stats.points} pts`,
+      value: (member.stats?.points || 0).toLocaleString(),
+      shortValue: `${member.stats?.points || 0} pts`,
       icon: Trophy,
       color: 'bg-[var(--teal)]'
     },
     {
       label: 'Streak',
-      value: `${member.stats.streak}d`,
-      shortValue: `${member.stats.streak}d streak`,
+      value: `${member.stats?.streak || 0}d`,
+      shortValue: `${member.stats?.streak || 0}d streak`,
       icon: Flame,
       color: 'bg-[var(--coral)]'
     },
